@@ -3,10 +3,12 @@ import { PagedCell, PagedImageCell } from "./cells";
 import { Table, Column, Cell } from "fixed-data-table-2";
 import React from "react";
 
+const PAGE_SIZE = 5;
+
 class PagedData {
   constructor(callback) {
     this._dataList = new FakeObjectDataListStore(2000);
-    this._end = 50;
+    this._end = PAGE_SIZE;
     this._pending = false;
     this._dataVersion = 0;
     this._callback = callback;
@@ -36,7 +38,7 @@ class PagedData {
 
   getObjectAt(index) {
     if (index >= this._end) {
-      this.fetchRange(Math.min(2000, index + 50));
+      this.fetchRange(Math.min(2000, index + PAGE_SIZE));
       return null;
     }
     return this._dataList.getObjectAt(index);
@@ -50,7 +52,7 @@ class InfiniteScrollExample extends React.Component {
     this._updateData = this._updateData.bind(this);
     this.state = {
       pagedData: new PagedData(this._updateData),
-      end: 50
+      end: PAGE_SIZE
     };
   }
 
@@ -58,6 +60,8 @@ class InfiniteScrollExample extends React.Component {
   _updateData(end) {
     this.setState({
       end: end
+    }, () => {
+        console.log("data updated - end = ", end, "_dataVersion = ", this.state.pagedData.getDataVersion());
     });
   }
 
